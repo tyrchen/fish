@@ -1,0 +1,9 @@
+*.pyc
+data
+*.xml
+.idea
+*.iml
+job/jobs/spiders/spiders/spiders/data/*.py
+logs
+build
+job/jobs/raileurope/
