@@ -11,7 +11,11 @@ on_callback: dict数据处理，主要的业务逻辑。需要定制。
 sync_run: 同步运行代码。
 reduce: 将计算结果汇总，研究机制中。
 
-Manager模型(任务的管理者)： clear_workers(task_name): 清理workers get_admin(): 取得admin实例，可以于服务器打交到，得到他的一些数据，能清理task中的queue/ get_worker(): 可以取得一个workder手动测试代码 get_client(): 得到一个gearman客户端，可以分发任务。
+Manager模型(任务的管理者)：
+clear_workers(task_name): 清理workers 
+get_admin(): 取得admin实例，可以于服务器打交到，得到他的一些数据，能清理task中的queue
+get_worker(): 可以取得一个workder手动测试代码 
+get_client(): 得到一个gearman客户端，可以分发任务。
 
 注意事项：
 
