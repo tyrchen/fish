@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function
+# __author__ = chenchiyuan
 
+from __future__ import division, unicode_literals, print_function
 from django.contrib import admin
-from job.models import Job, Manager
+from models import Job, Manager
 
 class ManagerAdmin(admin.ModelAdmin):
   pass

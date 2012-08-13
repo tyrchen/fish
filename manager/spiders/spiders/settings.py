@@ -5,6 +5,7 @@
 #
 #     http://doc.scrapy.org/topics/settings.html
 #
+import os
 
 LOG_ENABLED = False
 BOT_NAME = 'spiders'
@@ -12,6 +13,5 @@ BOT_VERSION = '1.0'
 
 SPIDER_MODULES = ['spiders.spiders']
 NEWSPIDER_MODULE = 'spiders.spiders'
-DEFAULT_ITEM_CLASS = 'spiders.items.SpidersItem'
-USER_AGENT = 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/534.25 (KHTML, like Gecko) Chrome/12.0.706.0 Safari/534.25'
 
+USER_AGENT = 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/534.25 (KHTML, like Gecko) Chrome/12.0.706.0 Safari/534.25'

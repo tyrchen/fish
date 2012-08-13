@@ -3,14 +3,16 @@ from __future__ import division, unicode_literals, print_function
 
 from scrapy.contrib.spiders import CrawlSpider
 from scrapy.http.request import Request
-import time
+
+import os
 
 START = %d
 END = %d
 
 INTERVAL = 1
 BASE_URL = 'http://www.mafengwo.cn/i/'
-store_addr = lambda s: 'data/' + s + '.html'
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../', '../', '../', 'data/')
+store_addr = lambda s: DATA_DIR + s + '.html'
 parse_url = lambda obj: BASE_URL + str(obj) + '.html'
 
 class Spider(CrawlSpider):
@@ -24,14 +26,13 @@ class Spider(CrawlSpider):
       request = Request(url=url, callback=self.parse_detail)
       request.meta['obj_id'] = str(obj)
       yield request
-#      time.sleep(INTERVAL)
 
   def parse_detail(self, response):
     data = response.body
     if len(data) < 200:
       return
 
-    print("Now Parse mafengwo youji id ", response.request.meta['obj_id'])
+    print("Mafengwo youji id ", response.request.meta['obj_id'])
     file = open(store_addr(response.request.meta['obj_id']), 'w')
     file.write(data)
     file.close()

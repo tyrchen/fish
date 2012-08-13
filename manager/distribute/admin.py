@@ -1,24 +1,13 @@
 # -*- coding: utf-8 -*-
+# __author__ = chenchiyuan
+
 from __future__ import division, unicode_literals, print_function
+from gearman.admin_client import GearmanAdminClient
+from manager.distribute.workers import Worker
+from manager.utils import get_gearman_host
 
 import json
-from gearman.client import GearmanClient
-from gearman.admin_client import GearmanAdminClient
-from job.workers import Worker
-from job.utils import get_gearman_host
 import os
-
-class Client(GearmanClient):
-  def __init__(self, host_list=get_gearman_host(), *args, **kwargs):
-    super(Client, self).__init__(host_list, *args, **kwargs)
-
-  def send_job(self, name, data, unique=False, *args, **kwargs):
-    print("Send job task %s, %r" %(name, data))
-    self.submit_job(task=name, data=data, unique=unique, *args, **kwargs)
-
-  def send_jobs(self, jobs, wait_until_complete=False, background=False):
-    print("Send jobs count %d" %len(jobs))
-    return self.submit_multiple_jobs(jobs, wait_until_complete=wait_until_complete, background=background)
 
 class Admin(GearmanAdminClient):
   def __init__(self, host_list=get_gearman_host(), *args, **kwargs):
@@ -26,6 +15,10 @@ class Admin(GearmanAdminClient):
     self.host_list = host_list
 
   def get_status(self):
+    """
+    获取queue server的状态
+    @return {}
+    """
     return super(Admin, self).get_status()
 
   def get_workers(self):
@@ -38,6 +31,10 @@ class Admin(GearmanAdminClient):
     return super(Admin, self).ping_server()
 
   def empty_task(self, task):
+    """
+    清空某任务，采用lazy的方式。
+    使用一个什么都不干的worker收拾任务。
+    """
     def callback(worker, job):
       return json.dumps({'a': 'a'})
 
@@ -46,9 +43,15 @@ class Admin(GearmanAdminClient):
     worker.safely_work()
 
   def start_server(self, port=4730):
+    """
+    开启任务，调用gearmand -d 命令，指定在本地的某port
+    """
     os.system('gearmand -d -L 0.0.0.0 -p %s' %str(port))
     print("Job Server Start at port %s" %str(port))
 
   def send_shutdown(self, graceful=True):
+    """
+    shut downserver, 但是不是实时关闭。
+    """
     print("Job Server will shutdown")
     return super(Admin, self).send_shutdown(graceful)

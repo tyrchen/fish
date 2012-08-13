@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+# __author__ = chenchiyuan
+
 from __future__ import division, unicode_literals, print_function
+
 from gearman.worker import GearmanWorker
 import json
 import threading
-from utils import get_gearman_host
+from manager.utils import get_gearman_host
 
 class Worker(GearmanWorker):
   def __init__(self, host_list=get_gearman_host()):
@@ -44,4 +47,3 @@ class ThreadWorker(threading.Thread):
   def run(self):
     self.worker.register_task(self.task, self.callback)
     self.worker.safely_work()
-    

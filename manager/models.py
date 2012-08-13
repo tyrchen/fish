@@ -2,13 +2,16 @@
 from __future__ import division, unicode_literals, print_function
 from django.db import models
 from gearman.constants import *
+from distribute.clients import Client
+from distribute.admin import Admin
+from distribute.workers import Worker, ThreadWorker
+from utils import get_gearman_host
+
+import tasks
 import json
-import inspect
-from job.clients import Client, Admin
-from job.workers import Worker, ThreadWorker
-from job.utils import get_gearman_host
-from job.tasks import tasks
-from settings import logger
+import logging
+
+logger = logging.getLogger(__name__)
 
 class JsonField(models.TextField):
   __metaclass__ = models.SubfieldBase
@@ -38,10 +41,14 @@ class JsonField(models.TextField):
     return self.get_prep_value(value)
 
 class Manager(models.Model):
+  """ 任务管理 -》 每个具体的task对应一个任务管理
+  具体实现取决于task_handle的引用，采用反射来获取handle。
+  distribute任务前，必须test通过，不要手动设置tested变量。
+  """
   class Meta:
     verbose_name = verbose_name_plural = u'任务管理器'
 
-  HANDLE_CHOICES = tuple([(name, name) for name, obj in inspect.getmembers(tasks) if inspect.isclass(obj)])
+  HANDLE_CHOICES = tuple([(obj.__name__, obj.__name__) for obj in tasks.__all__])
 
   name = models.CharField(verbose_name=u'名字', max_length=36, unique=True)
   description = models.CharField(verbose_name=u'描述', max_length=512, default='', blank=True)
@@ -54,6 +61,9 @@ class Manager(models.Model):
     return u'%s %s' %(self.name, self.description)
 
   def dispatch(self, create=False, *args, **kwargs):
+    """任务分发
+    必须满足分发任务所需要的参数。任务管理者自己应该清楚。
+    """
     if not self.tested:
       print('You must run script to test the task manager, then you can dispatch tasks')
       logger.error("Must test manager %s" %self.name)
@@ -115,12 +125,25 @@ class Manager(models.Model):
       self.clear_worker()
 
   def get_admin(self):
+    """
+    获得admin实例，可以管理gearmand
+
+    """
     return Admin([self.server_address])
 
   def get_client(self):
+    '''
+    获得gearman client, 可以分发任务。
+    '''
     return Client([self.server_address])
 
   def test(self, *args, **kwargs):
+    """
+    简单的测试任务是否可以分发。测试过后可能出现的问题。
+    1. 编码在gearman中的传递。gearman只支持简单str编码。
+    2. worker关闭可能出现的问题。
+
+    """
     handle = getattr(tasks, self.task_handle)(*args, **kwargs)
     mapped_data = handle.map()
     

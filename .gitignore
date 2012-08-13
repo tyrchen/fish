@@ -1,9 +1,8 @@
 *.pyc
-data
-*.xml
+manager/data
+!manager/data/__init__.py
 .idea
-*.iml
-job/jobs/spiders/spiders/spiders/data/*.py
-logs
+manager/spiders/spiders/spiders/*.py
+!manager/spiders/spiders/spiders/__init__.py
+*.idea
 build
-job/jobs/raileurope/
